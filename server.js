@@ -1,28 +1,31 @@
-
 const express = require("express");
-const mysql = require("mysql");
 const bodyParser = require("body-parser");
-const ApplicantsRoutes =  require("./routes/applicants");
-var app = express();
+const routes =  require("./routes");
+const cors = require("cors");
+
+const app = express();
+
+const db = require('./model');
+db.sequelize.sync();
+// db.sequelize.sync().then(() => {
+//     console.log("Drop and re-sync db.");
+// });
+
+
+const corsOptions = {
+    origin: '*'
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/applicants", ApplicantsRoutes);
-var mysqlConnection = mysql.createConnection({
-    host : "localhost",
-    user : "root",
-    password : "password",
-    database : "bigteethrealitytv",
-    multipleStatements : true
-});
-console.log("connect: ", mysqlConnection);
-mysqlConnection.connect((err) => {
-    if(!err)
-    {
-        console.log("connected");
-    } else {
 
-        console.log("Connection Failed", err);
-    }
+
+app.get("/", (req, res) => {
+    res.json({ message: "Welcome to Priyankas application." });
 });
+
+app.use('/participant', routes);
 
 app.listen(3000);
